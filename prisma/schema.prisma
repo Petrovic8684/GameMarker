@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  regular
+  admin
+}
+
+model User {
+  id          Int        @id @default(autoincrement())
+  email       String     @unique
+  username    String
+  password    String
+  image       String?
+  role        Role       @default(regular)
+  gender      String
+  bio         String?
+  reviews     Review[]
+  isBanned    Boolean    @default(false)
+  followers   Follower[] @relation("UserFollowers")
+  following   Follower[] @relation("UserFollowing")
+}
+
+model Review {
+  id         Int        @id @default(autoincrement())
+  rating     Decimal?
+  comment    String?
+  completed  Boolean?
+  platform   String?
+  difficulty String?
+  gameId     Int
+  createdBy  Int
+
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  user       User       @relation(fields: [createdBy], references: [id])
+
+  @@index([createdBy])
+}
+
+model Follower {
+  id         Int      @id @default(autoincrement())
+  followerId Int
+  followedId Int
+  dismissed  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  follower   User     @relation("UserFollowing", fields: [followerId], references: [id])
+  followed   User     @relation("UserFollowers", fields: [followedId], references: [id])
+
+  @@unique([followerId, followedId])
+}
+
