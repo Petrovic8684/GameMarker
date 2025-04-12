@@ -13,7 +13,9 @@ async function bootstrap() {
     }),
   );
 
-  app.enableCors();
+  app.enableCors({
+    origin: 'https://game-marker.vercel.app',
+  });
 
   await app.listen(process.env.PORT ?? 3000);
 }
