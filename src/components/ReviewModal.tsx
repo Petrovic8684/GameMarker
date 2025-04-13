@@ -125,10 +125,10 @@ const ReviewModal = ({
               <option value="" disabled>
                 Choose difficulty
               </option>
+              <option value="Story">Story</option>
               <option value="Easy">Easy</option>
               <option value="Medium">Medium</option>
               <option value="Hard">Hard</option>
-              <option value="Story">Story</option>
               <option value="Ultra Hard">Ultra Hard</option>
               <option value="Nightmare">Nightmare</option>
             </select>

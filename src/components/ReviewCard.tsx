@@ -88,17 +88,17 @@ const ReviewCard = ({ review }: ReviewCardProps) => {
           {review.difficulty ? (
             <div
               className={`${
-                review.difficulty === "story"
+                review.difficulty === "Story"
                   ? "bg-blue-500"
-                  : review.difficulty === "easy"
+                  : review.difficulty === "Easy"
                   ? "bg-green-500"
-                  : review.difficulty === "medium"
+                  : review.difficulty === "Medium"
                   ? "bg-yellow-500"
-                  : review.difficulty === "hard"
+                  : review.difficulty === "Hard"
                   ? "bg-orange-500"
-                  : review.difficulty === "ultra hard"
+                  : review.difficulty === "Ultra Hard"
                   ? "bg-red-500"
-                  : review.difficulty === "nightmare"
+                  : review.difficulty === "Nightmare"
                   ? "bg-purple-500"
                   : "bg-gray-400"
               } text-white text-xs font-semibold py-1 px-3 rounded-full`}
