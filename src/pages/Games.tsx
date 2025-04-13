@@ -53,7 +53,7 @@ const Games = () => {
               <ClipLoader color="#3498db" loading={loading} size={50} />
             </div>
           ) : noResults ? (
-            <div className="text-gray-700 text-center mt-18">
+            <div className="text-gray-700 text-center mt-24">
               No games found matching your search.
               {error && <div className="text-red-500 mt-2">{error}</div>}
             </div>

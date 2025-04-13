@@ -39,20 +39,20 @@ const BioModal = ({ isOpen, onClose, onSubmit, initialBio }: BioModalProps) => {
           <textarea
             value={bio || ""}
             onChange={(e) => setBio(e.target.value)}
-            className="w-full p-2 border rounded-md focus:outline-none resize-none overflow-y-scroll"
+            className="w-full p-3 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none overflow-y-scroll"
             rows={4}
           />
         </div>
         <div className="flex justify-between">
           <button
             onClick={onClose}
-            className="bg-gray-300 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-400"
+            className="px-4 py-2 bg-gray-600 text-white font-semibold rounded-md hover:bg-gray-700"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
-            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+            className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700"
           >
             Submit
           </button>

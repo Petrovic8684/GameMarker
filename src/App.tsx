@@ -6,6 +6,8 @@ import Games from "./pages/Games";
 import ReviewDetail from "./pages/ReviewDetail";
 import GameDetail from "./pages/GameDetail";
 import UserDetail from "./pages/UserDetail";
+import GameReviews from "./pages/GameReviews";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
@@ -15,8 +17,10 @@ function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/games" element={<Games />} />
       <Route path="/reviews/:id" element={<ReviewDetail />} />
+      <Route path="/reviews/game/:id" element={<GameReviews />} />
       <Route path="/games/:id" element={<GameDetail />} />
       <Route path="/users/:id" element={<UserDetail />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }

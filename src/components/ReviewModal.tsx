@@ -69,29 +69,29 @@ const ReviewModal = ({
       <div className="absolute inset-0 backdrop-blur-xl backdrop-brightness-40"></div>
 
       <div className="relative bg-white p-6 rounded-lg shadow-lg w-full max-w-lg z-10 overflow-y-auto max-h-[90vh]">
-        <h2 className="text-2xl font-semibold mb-4">{game.name}</h2>
+        <h2 className="text-3xl font-semibold mb-4">{game.name}</h2>
 
-        <div className="mb-4">
-          <div className="mb-2">
+        <div>
+          <div className="mb-4">
             <label className="block text-gray-700">Rating</label>
-            <div className="flex gap-x-1">
+            <div className="flex gap-x-1 mt-2">
               {renderDynamicStars(rating, setRating)}
             </div>
           </div>
 
-          <div className="mb-2">
+          <div className="mb-4">
             <label className="block text-gray-700">Comment</label>
             <textarea
               value={comment || ""}
               onChange={(e) => setComment(e.target.value)}
-              className="w-full p-2 border rounded-md focus:outline-none resize-none overflow-y-scroll"
+              className="w-full p-3 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none overflow-y-scroll"
               rows={4}
             ></textarea>
           </div>
 
-          <div className="mb-2">
+          <div className="mb-4">
             <label className="block text-gray-700">Completed the Game?</label>
-            <div className="flex gap-x-4">
+            <div className="flex gap-x-4 mt-1">
               <label>
                 <input
                   type="radio"
@@ -120,14 +120,17 @@ const ReviewModal = ({
             <select
               value={difficulty || ""}
               onChange={(e) => setDifficulty(e.target.value)}
-              className="w-full p-2 border rounded-md focus:outline-none"
+              className="w-full p-3 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="" disabled>
                 Choose difficulty
               </option>
-              <option value="easy">Easy</option>
-              <option value="medium">Medium</option>
-              <option value="hard">Hard</option>
+              <option value="Easy">Easy</option>
+              <option value="Medium">Medium</option>
+              <option value="Hard">Hard</option>
+              <option value="Story">Story</option>
+              <option value="Ultra Hard">Ultra Hard</option>
+              <option value="Nightmare">Nightmare</option>
             </select>
           </div>
 
@@ -136,7 +139,7 @@ const ReviewModal = ({
             <select
               value={platform || ""}
               onChange={(e) => setPlatform(e.target.value)}
-              className="w-full p-2 border rounded-md focus:outline-none"
+              className="w-full p-3 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="" disabled>
                 Choose platform
@@ -145,21 +148,40 @@ const ReviewModal = ({
               <option value="PlayStation">PlayStation</option>
               <option value="Xbox">Xbox</option>
               <option value="Switch">Nintendo Switch</option>
+              <option value="Mobile">Mobile (iOS/Android)</option>
+              <option value="SteamDeck">Steam Deck</option>
+              <option value="Nintendo3DS">Nintendo 3DS</option>
+              <option value="PlayStationVita">PlayStation Vita</option>
+              <option value="GameBoy">Game Boy</option>
+              <option value="SegaGenesis">Sega Genesis</option>
+              <option value="Atari">Atari</option>
+              <option value="RetroConsoles">
+                Retro console (NES, SNES, Sega Master System...)
+              </option>
+              <option value="CloudGaming">
+                Cloud Gaming (xCloud, GeForce Now, Stadia...)
+              </option>
+              <option value="VirtualReality">
+                Virtual Reality (Oculus Rift, PlayStation VR...)
+              </option>
+              <option value="HandheldPC">
+                Handheld PC (ASUS ROG Ally, Lenovo Legion Go...)
+              </option>
             </select>
           </div>
 
           <div className="flex justify-between">
             <button
               onClick={onClose}
-              className="bg-gray-300 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-400"
+              className="px-4 py-2 bg-gray-600 text-white font-semibold rounded-md hover:bg-gray-700"
             >
               Cancel
             </button>
             <button
               onClick={handleSubmit}
-              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+              className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700"
             >
-              Submit Review
+              Submit
             </button>
           </div>
         </div>

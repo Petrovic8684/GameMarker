@@ -36,7 +36,7 @@ const Landing = () => {
             </div>
           ) : reviews.length === 0 ? (
             <div>
-              <div className="text-gray-700 text-center mt-18">
+              <div className="text-gray-700 text-center mt-24">
                 {!localStorage.getItem("token") ? (
                   <>
                     Welcome to GameMarker!
