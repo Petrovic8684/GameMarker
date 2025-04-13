@@ -60,7 +60,9 @@ const FollowerRow = ({
 
       <div className="flex-1">
         <Link to={`/users/${follow.follower.id}`}>
-          <h3 className="text-lg font-semibold">{follow.follower.username}</h3>
+          <h3 className="text-lg font-semibold text-blue-500 cursor-pointer">
+            {follow.follower.username}
+          </h3>
         </Link>
         <p className="text-sm text-gray-600">
           <span className="block sm:hidden">

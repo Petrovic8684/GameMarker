@@ -127,7 +127,7 @@ const ReviewModal = ({
               </option>
               <option value="Story">Story</option>
               <option value="Easy">Easy</option>
-              <option value="Medium">Medium</option>
+              <option value="Normal">Normal</option>
               <option value="Hard">Hard</option>
               <option value="Ultra Hard">Ultra Hard</option>
               <option value="Nightmare">Nightmare</option>

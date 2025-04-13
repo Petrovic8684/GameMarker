@@ -164,7 +164,7 @@ const ReviewDetail = () => {
                       ? "bg-blue-500"
                       : review.difficulty === "Easy"
                       ? "bg-green-500"
-                      : review.difficulty === "Medium"
+                      : review.difficulty === "Normal"
                       ? "bg-yellow-500"
                       : review.difficulty === "Hard"
                       ? "bg-orange-500"
