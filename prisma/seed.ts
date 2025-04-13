@@ -13,10 +13,11 @@ async function main() {
       role: Role.admin,
       image: 'https://www.w3schools.com/w3images/avatar3.png',
       gender: 'male',
+      bio: 'Exploring worlds, mastering games, and sharing the journey. 🎮',
     },
   });
 
-  console.log('Seed data inserted');
+  console.log('Seed data inserted.');
 }
 
 main()

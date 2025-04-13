@@ -29,7 +29,7 @@ export class CreateReviewDto {
 
   @IsOptional()
   @IsString()
-  @IsIn(['story', 'easy', 'normal', 'hard', 'ultra hard', 'nightmare'])
+  @IsIn(['Story', 'Easy', 'Normal', 'Hard', 'Ultra Hard', 'Nightmare'])
   readonly difficulty?: string | null;
 
   @IsInt()
