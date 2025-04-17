@@ -30,32 +30,40 @@ const ReviewCard = ({ review }: ReviewCardProps) => {
       key={review.id}
       className="bg-white rounded-lg shadow-lg p-6 flex flex-col lg:flex-row max-w-4xl mx-auto mb-6 transition-all duration-300 ease-in-out hover:bg-gray-100 hover:shadow-2xl"
     >
-      <div className="w-full lg:w-1/3">
-        <Link to={`/reviews/${review.id}`}>
-          <img
-            src={review.game.background_image}
-            alt={review.game.name}
-            className="w-full h-64 object-cover rounded-md"
-          />
-        </Link>
-      </div>
-
-      <div className="w-full lg:w-2/3 lg:ml-4 p-4 rounded-lg flex flex-col justify-between gap-y-4 lg:gap-y-0">
-        <div className="text-2xl font-bold text-gray-900">
-          <Link to={`/games/${review.game.id}`}>
-            <p
-              style={{
-                display: "-webkit-box",
-                WebkitLineClamp: 3,
-                WebkitBoxOrient: "vertical",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
-            >
-              {review.game.name.toUpperCase()}
-            </p>
+      {review.game ? (
+        <div className="w-full lg:w-1/3">
+          <Link to={`/reviews/${review.id}`}>
+            <img
+              src={review.game.background_image}
+              alt={review.game.name}
+              className="w-full h-64 object-cover rounded-md"
+            />
           </Link>
         </div>
+      ) : (
+        <></>
+      )}
+
+      <div className="w-full lg:w-2/3 lg:ml-4 p-4 rounded-lg flex flex-col justify-between gap-y-4">
+        {review.game ? (
+          <div className="text-2xl font-bold text-gray-900">
+            <Link to={`/reviews/${review.id}`}>
+              <p
+                style={{
+                  display: "-webkit-box",
+                  WebkitLineClamp: 3,
+                  WebkitBoxOrient: "vertical",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {review.game.name.toUpperCase()}
+              </p>
+            </Link>
+          </div>
+        ) : (
+          <></>
+        )}
 
         {review.rating ? (
           <div className="flex items-center gap-x-1">

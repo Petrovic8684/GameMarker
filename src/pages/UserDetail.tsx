@@ -18,19 +18,35 @@ const UserDetail = () => {
   const [reviewsCollapsed, setReviewsCollapsed] = useState<boolean>(true);
   const [followersCollapsed, setFollowersCollapsed] = useState<boolean>(true);
   const [showBioModal, setShowBioModal] = useState(false);
+  const [checkFollowCache, setCheckFollowCache] = useState<
+    Record<number, boolean>
+  >({});
 
   const { myUserId, myUserRole } = getUserInfoFromToken() || {};
 
   const handleCheckIsFollowing = async (userId: number) => {
+    if (checkFollowCache[userId] !== undefined) {
+      return { alreadyFollowing: checkFollowCache[userId], followData: [] };
+    }
+
     const followersResponse = await api.get(`/followers/user/${userId}`);
+    const followData = followersResponse?.data.followData ?? [];
 
-    const alreadyFollowing =
-      followersResponse?.data.followData?.some(
-        (follower: any) => follower.follower.id === myUserId
-      ) ?? false;
+    const alreadyFollowing = followData.some(
+      (follower: any) => follower.follower.id === myUserId
+    );
 
-    return { alreadyFollowing, followData: followersResponse.data.followData };
+    setCheckFollowCache((prev) => ({
+      ...prev,
+      [userId]: alreadyFollowing,
+    }));
+
+    return { alreadyFollowing, followData };
   };
+
+  useEffect(() => {
+    setCheckFollowCache({});
+  }, [id]);
 
   useEffect(() => {
     const fetchUserAndFollowers = async () => {
@@ -78,13 +94,16 @@ const UserDetail = () => {
   const handleFollow = async (userId: number) => {
     try {
       await api.post(`/followers/user/${userId}`);
-
       setData((prevData: any) => ({
         ...prevData,
         user: {
           ...prevData.user,
           alreadyFollowing: true,
         },
+      }));
+      setCheckFollowCache((prev) => ({
+        ...prev,
+        [userId]: true,
       }));
     } catch (err: any) {
       setError(
@@ -96,13 +115,16 @@ const UserDetail = () => {
   const handleUnfollow = async (userId: number) => {
     try {
       await api.delete(`/followers/user/${userId}`);
-
       setData((prevData: any) => ({
         ...prevData,
         user: {
           ...prevData.user,
           alreadyFollowing: false,
         },
+      }));
+      setCheckFollowCache((prev) => ({
+        ...prev,
+        [userId]: false,
       }));
     } catch (err: any) {
       setError(
@@ -131,7 +153,26 @@ const UserDetail = () => {
       });
     } catch (err: any) {
       setError(
-        err.response?.data.message || "An error occurred while following user."
+        err.response?.data.message ||
+          "An error occurred while dismissing follower."
+      );
+    }
+  };
+
+  const handleBan = async (shouldBan: boolean) => {
+    try {
+      await api.patch(`/users/${id}/banned`, { isBanned: shouldBan });
+      setData((prevData: any) => ({
+        ...prevData,
+        user: {
+          ...prevData.user,
+          isBanned: !prevData.user.isBanned,
+        },
+      }));
+    } catch (err: any) {
+      setError(
+        err.response?.data.message ||
+          "An error occurred while setting user ban status."
       );
     }
   };
@@ -157,7 +198,7 @@ const UserDetail = () => {
       ) : (
         <div className="max-w-4xl mx-auto p-6">
           <div className="bg-white rounded-lg shadow-lg p-8">
-            <div className="flex md:flex-row md:items-center flex-col md:gap-y-0 gap-y-4 items-start flex-col mb-6">
+            <div className="flex md:flex-row md:items-center flex-col md:gap-y-0 gap-y-4 items-start mb-6">
               <div className="min-w-24 max-h-24 max-w-24 min-h-24 rounded-full overflow-hidden">
                 <img
                   src={
@@ -203,9 +244,7 @@ const UserDetail = () => {
                 {myUserId && myUserId === data.user.id && (
                   <button
                     className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none cursor-pointer"
-                    onClick={() => {
-                      setShowBioModal(true);
-                    }}
+                    onClick={() => setShowBioModal(true)}
                   >
                     Edit Bio
                   </button>
@@ -213,6 +252,7 @@ const UserDetail = () => {
 
                 {myUserId &&
                   myUserId !== data.user.id &&
+                  data.user.isBanned === false &&
                   (data.user.alreadyFollowing ? (
                     <button
                       className="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600 focus:outline-none cursor-pointer"
@@ -228,118 +268,134 @@ const UserDetail = () => {
                       Follow
                     </button>
                   ))}
+
                 {myUserRole === "admin" &&
                   myUserId !== data.user.id &&
-                  data.user.role !== "admin" && (
-                    <button className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 focus:outline-none cursor-pointer">
+                  data.user.role !== "admin" &&
+                  (data.user.isBanned ? (
+                    <button
+                      className="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600 focus:outline-none cursor-pointer"
+                      onClick={() => handleBan(false)}
+                    >
+                      Unban
+                    </button>
+                  ) : (
+                    <button
+                      className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 focus:outline-none cursor-pointer"
+                      onClick={() => handleBan(true)}
+                    >
                       Ban
                     </button>
-                  )}
+                  ))}
               </div>
             </div>
 
-            <div className="mb-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">Bio</h2>
-              <p className="text-gray-700">
-                {data.user.bio ?? "No bio available"}
-              </p>
-            </div>
-
-            {myUserId === data.user.id && (
-              <div className="mt-6">
-                <div className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                  <div
-                    className="mr-2 p-1 rounded-full hover:bg-gray-200 cursor-pointer"
-                    title="Toggle followers list"
-                    onClick={toggleFollowersCollapse}
-                  >
-                    {followersCollapsed ? (
-                      <FaChevronDown className="text-gray-600" />
-                    ) : (
-                      <FaChevronUp className="text-gray-600" />
-                    )}
-                  </div>
-                  Followed by{" "}
-                  {data.user.newFollowersCount > 0 ? (
-                    <p
-                      className="w-5 h-5 rounded-full bg-red-500 text-white text-xs flex justify-center items-center ml-2"
-                      title="Followers count"
-                    >
-                      {data.user.newFollowersCount}
-                    </p>
-                  ) : (
-                    <></>
-                  )}
+            {data.user.isBanned ? (
+              <div className="text-red-500">This user is banned.</div>
+            ) : (
+              <>
+                <div className="mb-6">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                    Bio
+                  </h2>
+                  <p className="text-gray-700">
+                    {data.user.bio ?? "No bio available"}
+                  </p>
                 </div>
-                {!followersCollapsed && (
-                  <div className="space-y-4">
-                    {data.user.followers && data.user.followers.length > 0 ? (
-                      data.user.followers.map((follow: any) => {
-                        return (
-                          <FollowerRow
-                            key={follow.id}
-                            follow={follow}
-                            handleCheckIsFollowing={() =>
-                              handleCheckIsFollowing(follow.follower.id)
-                            }
-                            handleFollow={() =>
-                              handleFollow(follow.follower.id)
-                            }
-                            handleUnfollow={() =>
-                              handleUnfollow(follow.follower.id)
-                            }
-                            handleDismiss={() => handleDismiss(follow.id)}
-                          />
-                        );
-                      })
-                    ) : (
-                      <p className="text-gray-700">No followers available.</p>
+
+                {myUserId === data.user.id && (
+                  <div className="mt-6">
+                    <div className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                      <div
+                        className="mr-2 p-1 rounded-full hover:bg-gray-200 cursor-pointer"
+                        title="Toggle followers list"
+                        onClick={toggleFollowersCollapse}
+                      >
+                        {followersCollapsed ? (
+                          <FaChevronDown className="text-gray-600" />
+                        ) : (
+                          <FaChevronUp className="text-gray-600" />
+                        )}
+                      </div>
+                      Followed by
+                      {data.user.newFollowersCount > 0 && (
+                        <p
+                          className="w-5 h-5 rounded-full bg-red-500 text-white text-xs flex justify-center items-center ml-2"
+                          title="Followers count"
+                        >
+                          {data.user.newFollowersCount}
+                        </p>
+                      )}
+                    </div>
+                    {!followersCollapsed && (
+                      <div className="space-y-4">
+                        {data.user.followers?.length > 0 ? (
+                          data.user.followers.map((follow: any) => (
+                            <FollowerRow
+                              key={follow.id}
+                              follow={follow}
+                              handleCheckIsFollowing={() =>
+                                handleCheckIsFollowing(follow.follower.id)
+                              }
+                              handleFollow={() =>
+                                handleFollow(follow.follower.id)
+                              }
+                              handleUnfollow={() =>
+                                handleUnfollow(follow.follower.id)
+                              }
+                              handleDismiss={() => handleDismiss(follow.id)}
+                            />
+                          ))
+                        ) : (
+                          <p className="text-gray-700">
+                            No followers available.
+                          </p>
+                        )}
+                      </div>
                     )}
                   </div>
                 )}
-              </div>
-            )}
 
-            <div className="mt-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                <div
-                  className="mr-2 p-1 rounded-full hover:bg-gray-200 cursor-pointer"
-                  title="Toggle reviews list"
-                  onClick={toggleReviewsCollapse}
-                >
-                  {reviewsCollapsed ? (
-                    <FaChevronDown className="text-gray-600" />
-                  ) : (
-                    <FaChevronUp className="text-gray-600" />
+                <div className="mt-6">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                    <div
+                      className="mr-2 p-1 rounded-full hover:bg-gray-200 cursor-pointer"
+                      title="Toggle reviews list"
+                      onClick={toggleReviewsCollapse}
+                    >
+                      {reviewsCollapsed ? (
+                        <FaChevronDown className="text-gray-600" />
+                      ) : (
+                        <FaChevronUp className="text-gray-600" />
+                      )}
+                    </div>
+                    Reviews by {data.user.username}
+                  </h2>
+                  {!reviewsCollapsed && (
+                    <div className="space-y-4">
+                      {data.reviews?.length > 0 ? (
+                        data.reviews.map((review: any) => (
+                          <ReviewCard key={review.id} review={review} />
+                        ))
+                      ) : (
+                        <p className="text-gray-700">No reviews available.</p>
+                      )}
+                    </div>
                   )}
                 </div>
-                Reviews by {data.user.username}
-              </h2>
-              {!reviewsCollapsed && (
-                <div className="space-y-4">
-                  {data.reviews && data.reviews.length > 0 ? (
-                    data.reviews.map((review: any) => (
-                      <ReviewCard key={review.id} review={review} />
-                    ))
-                  ) : (
-                    <p className="text-gray-700">No reviews available.</p>
-                  )}
-                </div>
-              )}
-            </div>
+              </>
+            )}
           </div>
         </div>
       )}
 
-      {data ? (
+      {data && (
         <BioModal
           isOpen={showBioModal}
           onClose={() => setShowBioModal(false)}
           onSubmit={handleUpdateBio}
           initialBio={data.user.bio}
         />
-      ) : (
-        <></>
       )}
     </div>
   );

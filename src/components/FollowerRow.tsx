@@ -14,6 +14,7 @@ interface FollowerProps {
       role: string;
       image: string;
       gender: string;
+      isBanned: boolean;
     };
     createdAt: string;
     dismissed: boolean;
@@ -75,34 +76,40 @@ const FollowerRow = ({
       </div>
 
       <div className="flex sm:gap-x-4 gap-x-2 items-center">
-        {isFollowing ? (
-          <button
-            className="hidden sm:block bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600 focus:outline-none cursor-pointer"
-            onClick={handleUnfollow}
-          >
-            Unfollow
-          </button>
-        ) : (
-          <button
-            className="hidden sm:block bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 focus:outline-none cursor-pointer"
-            onClick={handleFollow}
-          >
-            Follow back
-          </button>
-        )}
+        {follow.follower.isBanned === false ? (
+          <>
+            {isFollowing ? (
+              <button
+                className="hidden sm:block bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600 focus:outline-none cursor-pointer"
+                onClick={handleUnfollow}
+              >
+                Unfollow
+              </button>
+            ) : (
+              <button
+                className="hidden sm:block bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 focus:outline-none cursor-pointer"
+                onClick={handleFollow}
+              >
+                Follow back
+              </button>
+            )}
 
-        {isFollowing ? (
-          <IoArrowUndoCircle
-            onClick={handleUnfollow}
-            className="block sm:hidden text-yellow-500 w-8 h-8 cursor-pointer"
-            title="Unfollow"
-          />
+            {isFollowing ? (
+              <IoArrowUndoCircle
+                onClick={handleUnfollow}
+                className="block sm:hidden text-yellow-500 w-8 h-8 cursor-pointer"
+                title="Unfollow"
+              />
+            ) : (
+              <IoArrowUndoCircle
+                onClick={handleFollow}
+                className="block sm:hidden text-green-500 w-8 h-8 cursor-pointer"
+                title="Follow back"
+              />
+            )}
+          </>
         ) : (
-          <IoArrowUndoCircle
-            onClick={handleFollow}
-            className="block sm:hidden text-green-500 w-8 h-8 cursor-pointer"
-            title="Follow back"
-          />
+          <></>
         )}
 
         {!follow.dismissed && (
