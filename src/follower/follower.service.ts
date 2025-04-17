@@ -22,6 +22,9 @@ export class FollowerService {
     if (!followedUser)
       throw new BadRequestException(`User with ID ${id} not found`);
 
+    if (followedUser.isBanned === true)
+      throw new BadRequestException(`User with ID ${id} is banned`);
+
     if (userId === id)
       throw new BadRequestException('Unable to follow yourself');
 
@@ -48,6 +51,7 @@ export class FollowerService {
             image: true,
             gender: true,
             bio: true,
+            isBanned: true,
           },
         },
         followed: {
@@ -59,6 +63,7 @@ export class FollowerService {
             image: true,
             gender: true,
             bio: true,
+            isBanned: true,
           },
         },
       },
@@ -82,6 +87,9 @@ export class FollowerService {
     if (!followedUser)
       throw new BadRequestException(`User with ID ${id} not found`);
 
+    if (followedUser.isBanned === true)
+      throw new BadRequestException(`User with ID ${id} is banned`);
+
     const followData = await this.prisma.follower.findUnique({
       include: {
         follower: {
@@ -93,6 +101,7 @@ export class FollowerService {
             image: true,
             gender: true,
             bio: true,
+            isBanned: true,
           },
         },
         followed: {
@@ -104,6 +113,7 @@ export class FollowerService {
             image: true,
             gender: true,
             bio: true,
+            isBanned: true,
           },
         },
       },
@@ -147,9 +157,11 @@ export class FollowerService {
             image: true,
             gender: true,
             bio: true,
+            isBanned: true,
           },
         },
       },
+      orderBy: { createdAt: 'desc' },
     });
 
     const followData = followers.map((follow) => {
@@ -189,6 +201,7 @@ export class FollowerService {
             image: true,
             gender: true,
             bio: true,
+            isBanned: true,
           },
         },
       },

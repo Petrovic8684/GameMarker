@@ -3,9 +3,10 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserBioDto } from './dto/update-user-bio.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthUserService } from '../auth/auth-user.service';
+import { UpdateUserBanStatusDto } from './dto/update-user-ban-status.dto';
 
 @Injectable()
 export class UserService {
@@ -14,7 +15,7 @@ export class UserService {
     private authUserService: AuthUserService,
   ) {}
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async updateBio(id: number, updateUserDto: UpdateUserBioDto) {
     let { bio } = updateUserDto;
     if (bio === '') bio = null;
 
@@ -49,6 +50,44 @@ export class UserService {
 
     return {
       message: 'Successfully updated user bio',
+      user: updatedUser,
+    };
+  }
+
+  async updateBanStatus(id: number, updateUserDto: UpdateUserBanStatusDto) {
+    let { isBanned } = updateUserDto;
+
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        role: true,
+        isBanned: true,
+      },
+    });
+
+    if (!user) throw new NotFoundException(`User with ID ${id} not found`);
+
+    if (user.role === 'admin')
+      throw new ForbiddenException(`User with ID ${id} is an admin`);
+
+    const updatedUser = await this.prisma.user.update({
+      where: { id },
+      data: { isBanned: isBanned },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        role: true,
+        image: true,
+        gender: true,
+        bio: true,
+        isBanned: true,
+      },
+    });
+
+    return {
+      message: 'Successfully updated user ban status',
       user: updatedUser,
     };
   }

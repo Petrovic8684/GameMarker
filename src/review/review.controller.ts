@@ -27,6 +27,11 @@ export class ReviewController {
     return this.reviewService.create(createReviewDto);
   }
 
+  @Get()
+  findLatestReviews() {
+    return this.reviewService.findLatestReviews();
+  }
+
   @Get('/landing')
   @Role([Roles.regular, Roles.admin])
   @UseGuards(JwtAuthGuard, RolesGuard)

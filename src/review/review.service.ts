@@ -65,6 +65,72 @@ export class ReviewService {
   }
 
   // TODO: pagination
+  async findLatestReviews() {
+    const reviews = await this.prisma.review.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+            role: true,
+            image: true,
+            gender: true,
+            bio: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    const completeReviews = await Promise.all(
+      reviews.map(async (review) => {
+        try {
+          const gameResponse = await firstValueFrom(
+            this.httpService.get(
+              `${rawg_url}/games/${review.gameId}?key=${process.env.RAWG_KEY}`,
+            ),
+          );
+
+          const game = gameResponse.data;
+          const gameInfo = {
+            id: game.id,
+            name: game.name,
+            description: game.description,
+            released: game.released,
+            background_image: game.background_image,
+            saturated_color: game.saturated_color,
+            dominant_color: game.dominant_color,
+            genres: game.genres.map((genre: { name: string }) => genre.name),
+          };
+
+          const { user, ...reviewWithoutUser } = review;
+          return {
+            ...reviewWithoutUser,
+            createdBy: user,
+            game: gameInfo,
+          };
+        } catch (error) {
+          if (error.response?.status === 404) {
+            throw new NotFoundException(
+              `Game with ID ${review.gameId} not found`,
+            );
+          } else {
+            throw new HttpException(error.message, error.response?.status);
+          }
+        }
+      }),
+    );
+
+    return {
+      message: 'Successfully found all latest reviews',
+      reviews: completeReviews,
+    };
+  }
+
+  // TODO: pagination
   async findAllLandingReviews() {
     const followingUsers = await this.prisma.follower.findMany({
       where: { followerId: this.authUserService.user.id },
@@ -152,6 +218,7 @@ export class ReviewService {
         image: true,
         gender: true,
         bio: true,
+        isBanned: true,
       },
     });
 
@@ -167,6 +234,9 @@ export class ReviewService {
     const reviews = await this.prisma.review.findMany({
       where: {
         createdBy: id,
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     });
 
@@ -250,12 +320,14 @@ export class ReviewService {
       where: {
         gameId: id,
       },
+      orderBy: {
+        createdAt: 'desc',
+      },
     });
 
     const reviewsWithUserInfo = await Promise.all(
       reviews.map(async (review) => {
         const { createdBy } = review;
-        console.log(review);
 
         const user = await this.prisma.user.findUnique({
           where: { id: createdBy },

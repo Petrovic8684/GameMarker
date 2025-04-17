@@ -2,6 +2,7 @@ import {
   Injectable,
   BadRequestException,
   NotFoundException,
+  ForbiddenException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
@@ -52,6 +53,9 @@ export class AuthService {
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) throw new BadRequestException('Invalid credentials');
+
+    if (user.isBanned === true)
+      throw new ForbiddenException('This accound has been banned');
 
     const token = this.jwtService.sign({
       userId: user.id,
